@@ -37,4 +37,5 @@ public class CarController {
     public CarDTO updateCar(@PathVariable Long id, @RequestBody CarDTO carDTO) {
         return carService.updateCar(id, carDTO);
     }
+
 }

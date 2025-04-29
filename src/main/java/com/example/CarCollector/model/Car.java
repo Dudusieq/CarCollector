@@ -22,6 +22,7 @@ public class Car {
         this.marka = marka;
     }
 
+
     public void setModel(String model) {
         this.model = model;
     }
