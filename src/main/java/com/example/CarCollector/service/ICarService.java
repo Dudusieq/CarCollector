@@ -1,6 +1,7 @@
 package com.example.CarCollector.service;
 
 import com.example.CarCollector.dto.CarDTO;
+import com.example.CarCollector.model.Car;
 
 import java.util.List;
 
@@ -14,4 +15,10 @@ public interface ICarService {
     void deleteCar(Long id);
 
     CarDTO updateCar(Long id, CarDTO carDTO);
+
+    List<Car> findCarsByOwnerName(String name);
+
+    List<CarDTO> searchCarsByMarka(String marka);
+
+    List<CarDTO> searchCarsByOwner(String ownerName);
 }

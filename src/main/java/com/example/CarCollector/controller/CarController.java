@@ -1,6 +1,7 @@
 package com.example.CarCollector.controller;
 
 import com.example.CarCollector.dto.CarDTO;
+import com.example.CarCollector.model.Car;
 import com.example.CarCollector.service.CarService;
 import com.example.CarCollector.service.ICarService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,25 +26,43 @@ public class CarController {
     public CarDTO createCar(@RequestBody CarDTO carDTO) {
         return carService.createCar(carDTO);
     }
+
     //pobranie wszystkich pojazdow
     @GetMapping
     public List<CarDTO> getAllCars() {
         return carService.getAllCars();
     }
+
     //pobranie jednego pojazdu
     @GetMapping("/{id}")
     public CarDTO getCarById(@PathVariable Long id) {
         return carService.getCarById(id);
     }
+
     //usuwanie pojazdu
     @DeleteMapping("/{id}")
     public void deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
     }
+
     //aktualizaja danych pojazdu
     @PutMapping("/{id}")
     public CarDTO updateCar(@PathVariable Long id, @RequestBody CarDTO carDTO) {
         return carService.updateCar(id, carDTO);
+    }
+
+    //wyszukiwanie po wlascicielu
+    @GetMapping("/search")
+    public List<Car> findCarsByOwnerName(@RequestParam String name){
+        return carService.findCarsByOwnerName(name);
+    }
+    @GetMapping("/searchByMarka")
+    public List<CarDTO> searchCarsByMarka(@RequestParam String marka) {
+        return carService.searchCarsByMarka(marka);
+    }
+    @GetMapping("/searchByOwner")
+    public List<CarDTO> searchCarsByOwner(@RequestParam String ownerName) {
+        return carService.searchCarsByOwner(ownerName);
     }
 
 }

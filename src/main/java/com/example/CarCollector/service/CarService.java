@@ -4,9 +4,7 @@ import com.example.CarCollector.dto.CarDTO;
 import com.example.CarCollector.map.CarMap;
 import com.example.CarCollector.model.Car;
 import com.example.CarCollector.repository.CarRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -36,13 +34,28 @@ public class CarService implements ICarService {
                 .map(carMap::toCarDTO)
                 .toList();
     }
-    //pobieranie jednego pojazdu
+    //pobieranie jednego pojazdu za pomoca id
     @Override
     public CarDTO getCarById(Long id) {
         return carRepository.findById(id)
                 .map(carMap::toCarDTO)
                 .orElseThrow(() -> new RuntimeException("Samochód nie znaleziony"));
     }
+    //wyszukanie marki pojazdu
+    public List<CarDTO> searchCarsByMarka(String marka) {
+        return carRepository.findByMarkaContainingIgnoreCase(marka)
+                .stream()
+                .map(carMap::toCarDTO)
+                .toList();
+    }
+    //wyszkuanie wlasciciela pojazdu
+    public List<CarDTO> searchCarsByOwner(String ownerName) {
+        return carRepository.findByOwnerNameContainingIgnoreCase(ownerName)
+                .stream()
+                .map(carMap::toCarDTO)
+                .toList();
+    }
+
     //usuwanie pojazdu
     @Override
     public void deleteCar(Long id) {
@@ -52,11 +65,28 @@ public class CarService implements ICarService {
     @Override
     public CarDTO updateCar(Long id, CarDTO carDTO) {
         return carRepository.findById(id).map(car -> {
+
+            car.setId(carDTO.getId());
             car.setMarka(carDTO.getMarka());
             car.setModel(carDTO.getModel());
             car.setMoc(carDTO.getMoc());
+            car.setPrzyspieszenie(carDTO.getPrzyspieszenie());
+            car.setSilnik(carDTO.getSilnik());
+
+            car.setOwner(carRepository.findById(carDTO.getOwner().getId())
+                    .orElseThrow(() -> new RuntimeException("Właściciel nie został znaleziony")).getOwner());
+
+            car.setBrand(carRepository.findById(carDTO.getBrand().getId())
+                    .orElseThrow(() -> new RuntimeException("Marka nie została znaleziona")).getBrand());
+
+
+
             Car updatedCar = carRepository.save(car);
             return carMap.toCarDTO(updatedCar);
         }).orElseThrow(() -> new RuntimeException("Samochód nie został znaleziony"));
+    }
+
+    public List<Car> findCarsByOwnerName(String name){
+        return carRepository.findByOwnerNameContainingIgnoreCase(name);
     }
 }

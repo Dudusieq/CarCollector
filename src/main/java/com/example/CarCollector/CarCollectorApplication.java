@@ -13,12 +13,14 @@ public class CarCollectorApplication {
 
 		SpringApplication.run(CarCollectorApplication.class, args);
 
-		//sprawdzenie
+		/*//sprawdzenie
 		CarDTO carDTO = new CarDTO();
 		System.out.println("Marka: " + carDTO.getMarka());
 		System.out.println("Model: " + carDTO.getModel());
-		System.out.println("Moc: " + carDTO.getMoc());
-
+		System.out.println("Moc: " + carDTO.getMoc());*/
+		//np
+		// /cars/searchByOwner?ownerName=Jan
+		// /cars/searchByMarka?marka=BMW
 
 
 
