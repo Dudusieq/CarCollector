@@ -21,17 +21,14 @@ public class CarService implements ICarService {
         this.carRepository = carRepository;
         this.carMap = carMap;
     }
-
-
-
-
+    //dodanie pojazdu
     @Override
     public CarDTO createCar(CarDTO carDTO) {
         Car car = carMap.toCar(carDTO);
         Car savedCar = carRepository.save(car);
         return carMap.toCarDTO(savedCar);
     }
-
+    //pobranie wszystkich pojazdow
     @Override
     public List<CarDTO> getAllCars() {
         return carRepository.findAll()
@@ -39,22 +36,19 @@ public class CarService implements ICarService {
                 .map(carMap::toCarDTO)
                 .toList();
     }
-
+    //pobieranie jednego pojazdu
     @Override
     public CarDTO getCarById(Long id) {
         return carRepository.findById(id)
                 .map(carMap::toCarDTO)
-                .orElseThrow(() -> new RuntimeException("Car not found"));
+                .orElseThrow(() -> new RuntimeException("Samochód nie znaleziony"));
     }
-
+    //usuwanie pojazdu
     @Override
     public void deleteCar(Long id) {
-
         carRepository.deleteById(id);
     }
-
-
-
+    //aktualizacja danych pojazdu
     @Override
     public CarDTO updateCar(Long id, CarDTO carDTO) {
         return carRepository.findById(id).map(car -> {
