@@ -6,6 +6,7 @@ import com.example.CarCollector.model.Car;
 import com.example.CarCollector.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 

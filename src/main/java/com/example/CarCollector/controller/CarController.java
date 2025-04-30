@@ -3,6 +3,8 @@ package com.example.CarCollector.controller;
 import com.example.CarCollector.dto.CarDTO;
 import com.example.CarCollector.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +15,18 @@ public class CarController {
     @Autowired
     private CarService carService;
 
+
     @PostMapping
     public CarDTO createCar(@RequestBody CarDTO carDTO) {
         return carService.createCar(carDTO);
     }
 
     @GetMapping
-    public List<CarDTO> getAllCars() {
+    public List<CarDTO> /*String*/ getAllCars(/*Model model*/) {
+
         return carService.getAllCars();
+        /*model.addAttribute("cars", carService.getAllCars());
+        return "home";*/
     }
 
     @GetMapping("/{id}")

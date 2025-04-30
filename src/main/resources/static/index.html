@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>CarCollector</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Lista Samochodów</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-
-
-<h1>Informacje o samochodach</h1>
-
-<a href="http://localhost:8080/cars">Sprawdź samochody</a>
-
-
-
-
-
+<h1>Lista Samochodow</h1>
+<div class="container">
+    <div th:each="car : ${cars}" class="car">
+        <h3 th:text="${car.marka} + ' ' + ${car.model}">Nazwa Samochodu</h3>
+        <p th:text="'Moc: ' + ${car.moc} + ' KM'">Moc</p>
+        <hr/>
+    </div>
+</div>
 </body>
 </html>
