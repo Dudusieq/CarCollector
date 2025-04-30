@@ -11,19 +11,28 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 
 @Service
-public class CarService {
-    @Autowired
-    private CarRepository carRepository;
+public class CarService implements ICarService {
 
-    @Autowired
-    private CarMap carMap;
+    private final CarRepository carRepository;
 
+    private final CarMap carMap;
+
+    public CarService(CarRepository carRepository, CarMap carMap) {
+        this.carRepository = carRepository;
+        this.carMap = carMap;
+    }
+
+
+
+
+    @Override
     public CarDTO createCar(CarDTO carDTO) {
         Car car = carMap.toCar(carDTO);
         Car savedCar = carRepository.save(car);
         return carMap.toCarDTO(savedCar);
     }
 
+    @Override
     public List<CarDTO> getAllCars() {
         return carRepository.findAll()
                 .stream()
@@ -31,12 +40,14 @@ public class CarService {
                 .toList();
     }
 
+    @Override
     public CarDTO getCarById(Long id) {
         return carRepository.findById(id)
                 .map(carMap::toCarDTO)
                 .orElseThrow(() -> new RuntimeException("Car not found"));
     }
 
+    @Override
     public void deleteCar(Long id) {
 
         carRepository.deleteById(id);
@@ -44,6 +55,7 @@ public class CarService {
 
 
 
+    @Override
     public CarDTO updateCar(Long id, CarDTO carDTO) {
         return carRepository.findById(id).map(car -> {
             car.setMarka(carDTO.getMarka());

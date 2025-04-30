@@ -2,6 +2,7 @@ package com.example.CarCollector.controller;
 
 import com.example.CarCollector.dto.CarDTO;
 import com.example.CarCollector.service.CarService;
+import com.example.CarCollector.service.ICarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,8 +13,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/cars")
 public class CarController {
-    @Autowired
-    private CarService carService;
+
+    private final ICarService carService;
+
+    public CarController(ICarService carService) {
+        this.carService = carService;
+    }
 
 
     @PostMapping
@@ -22,11 +27,8 @@ public class CarController {
     }
 
     @GetMapping
-    public List<CarDTO> /*String*/ getAllCars(/*Model model*/) {
-
+    public List<CarDTO> getAllCars() {
         return carService.getAllCars();
-        /*model.addAttribute("cars", carService.getAllCars());
-        return "home";*/
     }
 
     @GetMapping("/{id}")
