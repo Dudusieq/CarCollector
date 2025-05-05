@@ -69,9 +69,9 @@ public class CarService implements ICarService {
             car.setId(carDTO.getId());
             car.setMarka(carDTO.getMarka());
             car.setModel(carDTO.getModel());
-            car.setMoc(carDTO.getMoc());
-            car.setPrzyspieszenie(carDTO.getPrzyspieszenie());
-            car.setSilnik(carDTO.getSilnik());
+            car.setPower(carDTO.getPower());
+            car.setSpeedUp(carDTO.getSpeedUp());
+            car.setEngine(carDTO.getEngine());
 
             car.setOwner(carRepository.findById(carDTO.getOwner().getId())
                     .orElseThrow(() -> new RuntimeException("Właściciel nie został znaleziony")).getOwner());
@@ -86,16 +86,30 @@ public class CarService implements ICarService {
         }).orElseThrow(() -> new RuntimeException("Samochód nie został znaleziony"));
     }
 
-    public List<CarDTO> searchCarsBySilnik(String silnik) {
-        return carRepository.findBySilnikContainingIgnoreCase(silnik)
+    public List<CarDTO> searchCarsByEngine(String engine) {
+        return carRepository.findByEngineContainingIgnoreCase(engine)
                 .stream()
                 .map(carMap::toCarDTO)
                 .toList();
     }
 
-    public List<CarDTO> searchCarsByMoc(String moc) {
-        return carRepository.findByMoc(Integer.valueOf(moc))
+    public List<CarDTO> searchCarsByPower(String power) {
+        return carRepository.findByPower(Integer.valueOf(power))
                 .stream()
+                .map(carMap::toCarDTO)
+                .toList();
+    }
+
+    public List<CarDTO> searchCarsByModel(String model) {
+        List<Car> cars = carRepository.findByModelContainingIgnoreCase(model);
+        return cars.stream()
+                .map(carMap::toCarDTO)
+                .toList();
+    }
+
+    public List<CarDTO> searchCarsBySpeedUp(Double speedup) {
+        List<Car> cars = carRepository.findBySpeedup(speedup);
+        return cars.stream()
                 .map(carMap::toCarDTO)
                 .toList();
     }

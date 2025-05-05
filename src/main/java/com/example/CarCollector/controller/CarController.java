@@ -63,15 +63,29 @@ public class CarController {
 
     // Wyszukiwanie po typie silnika
     @GetMapping("/searchE")
-    public List<CarDTO> searchCarsBySilnik(@RequestParam String silnik) {
-        return carService.searchCarsBySilnik(silnik);
+    public List<CarDTO> searchCarsByEngine(@RequestParam String engine) {
+        return carService.searchCarsByEngine(engine);
     }
 
     // Wyszukiwanie po mocy samochodu
     @GetMapping("/searchP")
-    public List<CarDTO> searchCarsByMoc(@RequestParam String moc) {
-        return carService.searchCarsByMoc(moc);
+    public List<CarDTO> searchCarsByPower(@RequestParam String power) {
+        return carService.searchCarsByPower(power);
     }
+
+    // Wyszukiwanie po modelu
+    @GetMapping("/searchModel")
+    public List<CarDTO> searchCarsByModel(@RequestParam String model) {
+        return carService.searchCarsByModel(model);
+    }
+
+    // Wyszukiwanie po przyspieszeniu
+    @GetMapping("/searchS")
+    public List<CarDTO> searchCarsBySpeedUp(@RequestParam Double speedup) {
+        return carService.searchCarsBySpeedUp(speedup);
+    }
+
+
 
 
 }

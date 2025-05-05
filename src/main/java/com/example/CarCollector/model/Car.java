@@ -3,15 +3,19 @@ package com.example.CarCollector.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="car")
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String marka;
     private String model;
-    private int moc;
-    private double przyspieszenie;
-    private String silnik;
+    @Column(name = "power")
+    private int power;
+    @Column(name = "speedup")
+    private double speedup;
+    @Column(name = "engine")
+    private String engine;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Owner owner;
@@ -27,24 +31,24 @@ public class Car {
     @ManyToOne(fetch = FetchType.EAGER)
     private Brand brand;
 
-    public void setPrzyspieszenie(double przyspieszenie) {
-        this.przyspieszenie = przyspieszenie;
+    public void setSpeedUp(double speedup) {
+        this.speedup = speedup;
     }
 
-    public void setSilnik(String silnik) {
-        this.silnik = silnik;
+    public void setEngine(String engine) {
+        this.engine = engine;
     }
 
     public void setBrand(Brand brand) {
         this.brand = brand;
     }
 
-    public double getPrzyspieszenie() {
-        return przyspieszenie;
+    public double getSpeedUp() {
+        return speedup;
     }
 
-    public String getSilnik() {
-        return silnik;
+    public String getEngine() {
+        return engine;
     }
 
     public Brand getBrand() {
@@ -65,8 +69,8 @@ public class Car {
         this.model = model;
     }
 
-    public void setMoc(int moc) {
-        this.moc = moc;
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public Long getId() {
@@ -81,7 +85,7 @@ public class Car {
         return model;
     }
 
-    public int getMoc() {
-        return moc;
+    public int getPower() {
+        return power;
     }
 }

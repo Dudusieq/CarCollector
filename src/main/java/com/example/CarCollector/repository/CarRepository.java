@@ -12,8 +12,9 @@ import java.util.List;
 public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findByOwnerNameContainingIgnoreCase(String ownerName);
     List<Car> findByMarkaContainingIgnoreCase(String marka);
-    List<Car> findBySilnikContainingIgnoreCase(String engine);
-    List<Car> findByMoc(Integer moc);
-
+    List<Car> findByEngineContainingIgnoreCase(String engine);
+    List<Car> findByPower(Integer power);
+    List<Car> findByModelContainingIgnoreCase(String model);
+    List<Car> findBySpeedup(Double speedup);
 }
 

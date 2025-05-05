@@ -1,12 +1,14 @@
 package com.example.CarCollector.dto;
 
+import jakarta.persistence.Column;
+
 public class CarDTO {
     private Long id;
     private String marka;
     private String model;
-    private int moc;
-    private double przyspieszenie;
-    private String silnik;
+    private int power;
+    private double speedup;
+    private String engine;
     private OwnerDTO owner;
     private BrandDTO brand;
 
@@ -18,12 +20,12 @@ public class CarDTO {
         this.id = id;
     }
 
-    public double getPrzyspieszenie() {
-        return przyspieszenie;
+    public double getSpeedUp() {
+        return speedup;
     }
 
-    public String getSilnik() {
-        return silnik;
+    public String getEngine() {
+        return engine;
     }
 
     public OwnerDTO getOwner() {
@@ -34,12 +36,12 @@ public class CarDTO {
         return brand;
     }
 
-    public void setPrzyspieszenie(double przyspieszenie) {
-        this.przyspieszenie = przyspieszenie;
+    public void setSpeedUp(double speedup) {
+        this.speedup = speedup;
     }
 
-    public void setSilnik(String silnik) {
-        this.silnik = silnik;
+    public void setEngine(String engine) {
+        this.engine = engine;
     }
 
     public void setOwner(OwnerDTO owner) {
@@ -58,8 +60,8 @@ public class CarDTO {
         this.model = model;
     }
 
-    public void setMoc(int moc) {
-        this.moc = moc;
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public String getMarka() {
@@ -70,8 +72,8 @@ public class CarDTO {
         return model;
     }
 
-    public int getMoc() {
-        return moc;
+    public int getPower() {
+        return power;
     }
 
 }

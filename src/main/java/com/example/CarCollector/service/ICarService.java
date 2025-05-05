@@ -20,7 +20,11 @@ public interface ICarService {
 
     List<CarDTO> searchCarsByOwner(String ownerName);
 
-    List<CarDTO> searchCarsBySilnik(String silnik);
+    List<CarDTO> searchCarsByEngine(String engine);
 
-    List<CarDTO> searchCarsByMoc(String moc);
+    List<CarDTO> searchCarsByPower(String power);
+
+    List<CarDTO> searchCarsByModel(String model);
+
+    List<CarDTO> searchCarsBySpeedUp(Double speedup);
 }
