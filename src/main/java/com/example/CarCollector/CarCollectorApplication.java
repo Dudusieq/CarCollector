@@ -17,7 +17,7 @@ public class CarCollectorApplication {
 		np
 
 		 /cars/searchO?ownerName=Anna
-		 /cars/searchM?marka=BMW
+		 /cars/searchB?brandcar=BMW
 		 /cars/searchE?engine=V8
 		 /cars/searchP?power=450
 		 /cars/searchModel?model=Mustang

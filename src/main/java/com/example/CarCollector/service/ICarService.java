@@ -16,7 +16,7 @@ public interface ICarService {
 
     CarDTO updateCar(Long id, CarDTO carDTO);
 
-    List<CarDTO> searchCarsByMarka(String marka);
+    List<CarDTO> searchCarsByBrandcar(String brandcar);
 
     List<CarDTO> searchCarsByOwner(String ownerName);
 

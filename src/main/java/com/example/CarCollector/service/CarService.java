@@ -42,8 +42,8 @@ public class CarService implements ICarService {
                 .orElseThrow(() -> new RuntimeException("Samochód nie znaleziony"));
     }
     //wyszukanie marki pojazdu
-    public List<CarDTO> searchCarsByMarka(String marka) {
-        return carRepository.findByMarkaContainingIgnoreCase(marka)
+    public List<CarDTO> searchCarsByBrandcar(String brandcar) {
+        return carRepository.findByBrandcarContainingIgnoreCase(brandcar)
                 .stream()
                 .map(carMap::toCarDTO)
                 .toList();
@@ -67,7 +67,7 @@ public class CarService implements ICarService {
         return carRepository.findById(id).map(car -> {
 
             car.setId(carDTO.getId());
-            car.setMarka(carDTO.getMarka());
+            car.setBrandcar(carDTO.getBrandcar());
             car.setModel(carDTO.getModel());
             car.setPower(carDTO.getPower());
             car.setSpeedUp(carDTO.getSpeedUp());

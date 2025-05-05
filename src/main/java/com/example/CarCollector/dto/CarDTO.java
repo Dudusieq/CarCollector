@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 
 public class CarDTO {
     private Long id;
-    private String marka;
+    private String brandcar;
     private String model;
     private int power;
     private double speedup;
@@ -52,8 +52,8 @@ public class CarDTO {
         this.brand = brand;
     }
 
-    public void setMarka(String marka) {
-        this.marka = marka;
+    public void setBrandcar(String brandcar) {
+        this.brandcar = brandcar;
     }
 
     public void setModel(String model) {
@@ -64,8 +64,8 @@ public class CarDTO {
         this.power = power;
     }
 
-    public String getMarka() {
-        return marka;
+    public String getBrandcar() {
+        return brandcar;
     }
 
     public String getModel() {

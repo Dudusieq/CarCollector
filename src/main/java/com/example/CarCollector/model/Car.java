@@ -8,7 +8,9 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String marka;
+    @Column(name = "brand")
+    private String brandcar;
+    @Column(name = "model")
     private String model;
     @Column(name = "power")
     private int power;
@@ -59,8 +61,8 @@ public class Car {
         this.id = id;
     }
 
-    public void setMarka(String marka) {
-        this.marka = marka;
+    public void setBrandcar(String brandcar) {
+        this.brandcar = brandcar;
     }
 
 
@@ -77,8 +79,8 @@ public class Car {
         return id;
     }
 
-    public String getMarka() {
-        return marka;
+    public String getBrandcar() {
+        return brandcar;
     }
 
     public String getModel() {

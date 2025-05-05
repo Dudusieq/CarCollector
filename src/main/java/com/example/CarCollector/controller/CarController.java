@@ -56,9 +56,9 @@ public class CarController {
     public List<CarDTO> searchCarsByOwner(@RequestParam String ownerName){
         return carService.searchCarsByOwner(ownerName);
     }
-    @GetMapping("/searchM")
-    public List<CarDTO> searchCarsByMarka(@RequestParam String marka) {
-        return carService.searchCarsByMarka(marka);
+    @GetMapping("/searchB")
+    public List<CarDTO> searchCarsByBrandcar(@RequestParam String brandcar) {
+        return carService.searchCarsByBrandcar(brandcar);
     }
 
     // Wyszukiwanie po typie silnika
