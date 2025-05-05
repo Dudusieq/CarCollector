@@ -52,17 +52,26 @@ public class CarController {
     }
 
     //wyszukiwanie po wlascicielu
-    @GetMapping("/search")
-    public List<Car> findCarsByOwnerName(@RequestParam String name){
-        return carService.findCarsByOwnerName(name);
+    @GetMapping("/searchO")
+    public List<CarDTO> searchCarsByOwner(@RequestParam String ownerName){
+        return carService.searchCarsByOwner(ownerName);
     }
-    @GetMapping("/searchByMarka")
+    @GetMapping("/searchM")
     public List<CarDTO> searchCarsByMarka(@RequestParam String marka) {
         return carService.searchCarsByMarka(marka);
     }
-    @GetMapping("/searchByOwner")
-    public List<CarDTO> searchCarsByOwner(@RequestParam String ownerName) {
-        return carService.searchCarsByOwner(ownerName);
+
+    // Wyszukiwanie po typie silnika
+    @GetMapping("/searchE")
+    public List<CarDTO> searchCarsBySilnik(@RequestParam String silnik) {
+        return carService.searchCarsBySilnik(silnik);
     }
+
+    // Wyszukiwanie po mocy samochodu
+    @GetMapping("/searchP")
+    public List<CarDTO> searchCarsByMoc(@RequestParam String moc) {
+        return carService.searchCarsByMoc(moc);
+    }
+
 
 }

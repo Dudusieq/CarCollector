@@ -86,7 +86,21 @@ public class CarService implements ICarService {
         }).orElseThrow(() -> new RuntimeException("Samochód nie został znaleziony"));
     }
 
-    public List<Car> findCarsByOwnerName(String name){
-        return carRepository.findByOwnerNameContainingIgnoreCase(name);
+    public List<CarDTO> searchCarsBySilnik(String silnik) {
+        return carRepository.findBySilnikContainingIgnoreCase(silnik)
+                .stream()
+                .map(carMap::toCarDTO)
+                .toList();
     }
+
+    public List<CarDTO> searchCarsByMoc(String moc) {
+        return carRepository.findByMoc(Integer.valueOf(moc))
+                .stream()
+                .map(carMap::toCarDTO)
+                .toList();
+    }
+
+
+
+
 }

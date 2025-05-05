@@ -19,8 +19,10 @@ public class CarCollectorApplication {
 		System.out.println("Model: " + carDTO.getModel());
 		System.out.println("Moc: " + carDTO.getMoc());*/
 		//np
-		// /cars/searchByOwner?ownerName=Jan
-		// /cars/searchByMarka?marka=BMW
+		// /cars/searchO?ownerName=Anna
+		// /cars/searchM?marka=BMW
+		// /cars/searchE?silnik=V8
+		// /cars/searchP?moc=450
 
 
 
