@@ -88,4 +88,12 @@ public class Car {
     public int getPower() {
         return power;
     }
+
+    public void setSpeedup(double speedup) {
+        this.speedup = speedup;
+    }
+
+    public double getSpeedup() {
+        return speedup;
+    }
 }
