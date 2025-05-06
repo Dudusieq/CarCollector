@@ -26,10 +26,10 @@ public class Car {
         return owner;
     }
 
-
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
+
     @ManyToOne(fetch = FetchType.EAGER)
     private Brand brand;
 
@@ -64,8 +64,6 @@ public class Car {
     public void setBrandcar(String brandcar) {
         this.brandcar = brandcar;
     }
-
-
 
     public void setModel(String model) {
         this.model = model;

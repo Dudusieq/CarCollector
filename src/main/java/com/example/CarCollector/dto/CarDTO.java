@@ -1,7 +1,5 @@
 package com.example.CarCollector.dto;
 
-import jakarta.persistence.Column;
-
 public class CarDTO {
     private Long id;
     private String brandcar;
@@ -75,5 +73,4 @@ public class CarDTO {
     public int getPower() {
         return power;
     }
-
 }

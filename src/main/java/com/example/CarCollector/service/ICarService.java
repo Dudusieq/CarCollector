@@ -1,8 +1,6 @@
 package com.example.CarCollector.service;
 
 import com.example.CarCollector.dto.CarDTO;
-import com.example.CarCollector.model.Car;
-
 import java.util.List;
 
 public interface ICarService {

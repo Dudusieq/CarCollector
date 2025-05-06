@@ -1,10 +1,7 @@
 package com.example.CarCollector;
 
-import com.example.CarCollector.dto.CarDTO;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.awt.desktop.SystemSleepEvent;
 
 @SpringBootApplication
 public class CarCollectorApplication {

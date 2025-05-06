@@ -1,15 +1,10 @@
 package com.example.CarCollector.controller;
 
 import com.example.CarCollector.dto.CarDTO;
-import com.example.CarCollector.model.Car;
-import com.example.CarCollector.service.CarService;
 import com.example.CarCollector.service.ICarService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/cars")
@@ -56,6 +51,8 @@ public class CarController {
     public List<CarDTO> searchCarsByOwner(@RequestParam String ownerName){
         return carService.searchCarsByOwner(ownerName);
     }
+
+    //wyszukanie po marce samochodu
     @GetMapping("/searchB")
     public List<CarDTO> searchCarsByBrandcar(@RequestParam String brandcar) {
         return carService.searchCarsByBrandcar(brandcar);
@@ -74,7 +71,7 @@ public class CarController {
     }
 
     // Wyszukiwanie po modelu
-    @GetMapping("/searchModel")
+    @GetMapping("/searchM")
     public List<CarDTO> searchCarsByModel(@RequestParam String model) {
         return carService.searchCarsByModel(model);
     }
@@ -84,8 +81,4 @@ public class CarController {
     public List<CarDTO> searchCarsBySpeedUp(@RequestParam Double speedup) {
         return carService.searchCarsBySpeedUp(speedup);
     }
-
-
-
-
 }

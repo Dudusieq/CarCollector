@@ -5,7 +5,6 @@ import com.example.CarCollector.map.CarMap;
 import com.example.CarCollector.model.Car;
 import com.example.CarCollector.repository.CarRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -79,8 +78,6 @@ public class CarService implements ICarService {
             car.setBrand(carRepository.findById(carDTO.getBrand().getId())
                     .orElseThrow(() -> new RuntimeException("Marka nie została znaleziona")).getBrand());
 
-
-
             Car updatedCar = carRepository.save(car);
             return carMap.toCarDTO(updatedCar);
         }).orElseThrow(() -> new RuntimeException("Samochód nie został znaleziony"));
@@ -113,8 +110,4 @@ public class CarService implements ICarService {
                 .map(carMap::toCarDTO)
                 .toList();
     }
-
-
-
-
 }
