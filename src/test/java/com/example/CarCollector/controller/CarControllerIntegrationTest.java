@@ -12,8 +12,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CarControllerIntegrationTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+
+    private final TestRestTemplate restTemplate;
+
+    public CarControllerIntegrationTest(TestRestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Test
     void getAllCars_returnsValidResponse() {

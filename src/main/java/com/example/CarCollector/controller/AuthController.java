@@ -1,6 +1,7 @@
 package com.example.CarCollector.controller;
 
 import com.example.CarCollector.security.JwtToken;
+import com.example.CarCollector.security.RefreshTokenService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -12,25 +13,38 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final JwtToken tokenP;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthController(JwtToken tokenP) {
+    public AuthController(JwtToken tokenP, RefreshTokenService refreshTokenService) {
         this.tokenP = tokenP;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        System.out.println("Otrzymano żądanie logowania od: " + loginRequest.getUsername());
-
-
-        if (!("user".equals(loginRequest.getUsername()) && "secret".equals(loginRequest.getPassword()))) {
+        if (!"user".equals(loginRequest.getUsername()) || !"secret".equals(loginRequest.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędne dane logowania");
         }
 
+        String accessToken = tokenP.generateToken(loginRequest.getUsername());
+        String refreshToken = refreshTokenService.generateRefreshToken(loginRequest.getUsername());
 
-        String token = tokenP.generateToken(loginRequest.getUsername());
+        return ResponseEntity.ok(new JwtAuthenticationResponse(accessToken, refreshToken));
+    }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshRequest) {
+        String refreshToken = refreshRequest.getRefreshToken();
 
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        if (!refreshTokenService.verifyRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
+
+        String username = refreshTokenService.getUsernameFromRefreshToken(refreshToken);
+        String newAccessToken = tokenP.generateToken(username);
+        String newRefreshToken = refreshTokenService.generateRefreshToken(username);
+
+        return ResponseEntity.ok(new JwtAuthenticationResponse(newAccessToken, newRefreshToken));
     }
 
     @Data
@@ -55,16 +69,34 @@ public class AuthController {
         }
     }
 
-    @Data
-    public static class JwtAuthenticationResponse {
+    public class JwtAuthenticationResponse {
         private final String token;
+        private final String refreshToken;
 
-        public JwtAuthenticationResponse(String token) {
+        public JwtAuthenticationResponse(String token, String refreshToken) {
             this.token = token;
+            this.refreshToken = refreshToken;
         }
 
         public String getToken() {
             return token;
+        }
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+    }
+
+    @Data
+    public static class RefreshTokenRequest {
+        private String refreshToken;
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
+        public void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
     }
 }
