@@ -3,6 +3,7 @@ package com.example.CarCollector.controller;
 import com.example.CarCollector.security.JwtToken;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         System.out.println("Otrzymano żądanie logowania od: " + loginRequest.getUsername());
+
+
+        if (!("user".equals(loginRequest.getUsername()) && "secret".equals(loginRequest.getPassword()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędne dane logowania");
+        }
+
+
         String token = tokenP.generateToken(loginRequest.getUsername());
+
 
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }

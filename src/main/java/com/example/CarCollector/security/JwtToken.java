@@ -32,7 +32,7 @@ public class JwtToken {
     }
 
     // Weryfikacja tokenu
-    public boolean validateToken(String authToken) {
+    public boolean verifyToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(authToken);
             return true;
@@ -41,4 +41,6 @@ public class JwtToken {
         }
         return false;
     }
+
+
 }
