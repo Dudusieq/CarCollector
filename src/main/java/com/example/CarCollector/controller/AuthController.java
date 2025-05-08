@@ -1,102 +1,60 @@
 package com.example.CarCollector.controller;
 
-import com.example.CarCollector.security.JwtToken;
-import com.example.CarCollector.security.RefreshTokenService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.example.CarCollector.dto.LoginRequestDTO;
+import com.example.CarCollector.exception.BadRequestException;
+import com.example.CarCollector.security.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final JwtToken tokenP;
-    private final RefreshTokenService refreshTokenService;
+    private final JwtService jwtService;
 
-    public AuthController(JwtToken tokenP, RefreshTokenService refreshTokenService) {
-        this.tokenP = tokenP;
-        this.refreshTokenService = refreshTokenService;
+    public AuthController(JwtService jwtService) {
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        if (!"user".equals(loginRequest.getUsername()) || !"secret".equals(loginRequest.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędne dane logowania");
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequestDTO request) {
+        System.out.println("Login attempt for user: " + request.getUsername() + " with password: " + request.getPassword());
+
+        String username = request.getUsername();
+        String password = request.getPassword();
+
+        if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
+            throw new BadRequestException("Username or password is required");
         }
 
-        String accessToken = tokenP.generateToken(loginRequest.getUsername());
-        String refreshToken = refreshTokenService.generateRefreshToken(loginRequest.getUsername());
+        String token = jwtService.generateToken(username);
+        System.out.println("Login successful for user: " + username);
 
-        return ResponseEntity.ok(new JwtAuthenticationResponse(accessToken, refreshToken));
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshRequest) {
-        String refreshToken = refreshRequest.getRefreshToken();
+    @GetMapping("/verify")
+    public ResponseEntity<Map<String, String>> verify(@RequestParam String token) {
+        System.out.println("Token verification request received");
 
-        if (!refreshTokenService.verifyRefreshToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        if (jwtService.verifyToken(token)) {
+            String username = jwtService.getUsernameFromJwt(token);
+            System.out.println("Token verified successfully for user: " + username);
+            return ResponseEntity.ok(Map.of("message", "Token valid for user: " + username));
         }
 
-        String username = refreshTokenService.getUsernameFromRefreshToken(refreshToken);
-        String newAccessToken = tokenP.generateToken(username);
-        String newRefreshToken = refreshTokenService.generateRefreshToken(username);
-
-        return ResponseEntity.ok(new JwtAuthenticationResponse(newAccessToken, newRefreshToken));
+        throw new BadRequestException("Invalid token");
     }
 
-    @Data
-    public static class LoginRequest {
-        private String username;
-        private String password;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
-
-    public class JwtAuthenticationResponse {
-        private final String token;
-        private final String refreshToken;
-
-        public JwtAuthenticationResponse(String token, String refreshToken) {
-            this.token = token;
-            this.refreshToken = refreshToken;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-    }
-
-    @Data
-    public static class RefreshTokenRequest {
-        private String refreshToken;
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-
-        public void setRefreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-        }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
+        System.out.println("Error: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
     }
 }

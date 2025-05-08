@@ -1,0 +1,59 @@
+package com.example.CarCollector.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+
+@Service
+public class JwtService {
+
+    private final String jwtSecretKey = "mySecret123456mySecret123456mySecret123456mySecret123456mySecret123456mySecret123456mySecret123456";
+    private final long jwtExpirationMs = 3600000;
+
+    public String generateToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        System.out.println("Generating token for user: " + username);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
+                .compact();
+    }
+
+    public boolean verifyToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(jwtSecretKey)
+                    .build()
+                    .parseClaimsJws(token);
+
+            System.out.println("JWT Verified for user: " + claims.getBody().getSubject());
+            return true;
+        } catch (JwtException e) {
+            System.out.println("JWT verification failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public String getUsernameFromJwt(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(jwtSecretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+}
+
+// zrobic wygasanie tokena zrobic w applications.properties, zrobic testy integracyjne
+// i to na cos innego zamienic
+// if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
+//            throw new BadRequestException("Username or password is required");
+//        }

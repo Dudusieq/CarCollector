@@ -2,6 +2,7 @@ package com.example.CarCollector.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,28 +13,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtToken jwtToken;
+    private final JwtAuthentication jwtAuthentication;
 
-    public SecurityConfig(JwtToken jwtToken) {
-        this.jwtToken = jwtToken;
+    public SecurityConfig(JwtAuthentication jwtAuthentication) {
+        this.jwtAuthentication = jwtAuthentication;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        JwtAuthentication jwtAuthentication = new JwtAuthentication(jwtToken);
-
-        http.csrf(csrf -> csrf.disable())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/**").permitAll() // Login dostępny bez autoryzacji
-                                .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/login", "/auth/verify").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthentication, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+}
 
-        // tutaj po dodaniu filtru JWT przed filtrem standardowej autentykacji po wykonaniu logowania nie zwraca tokenu
-        // jak odkomentuje to localhost dziala a zwracanie tokenu nie a jak zakometuje to localhost dziala ale za to zwraca tokenu(sprawdzone w postmanie)
-        //http.addFilterBefore(jwtAuthentication, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+/*
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }*/
+
