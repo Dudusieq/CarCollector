@@ -51,9 +51,3 @@ public class JwtService {
                 .getSubject();
     }
 }
-
-// zrobic wygasanie tokena zrobic w applications.properties, zrobic testy integracyjne
-// i to na cos innego zamienic
-// if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
-//            throw new BadRequestException("Username or password is required");
-//        }

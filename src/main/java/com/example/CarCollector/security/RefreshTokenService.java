@@ -1,14 +1,19 @@
 package com.example.CarCollector.security;
 
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service
 public class RefreshTokenService {
-    private final String refreshTokenSecret = "refreshSecretKey1234567890refreshSecretKey1234567890refreshSecretKey1234567890refreshSecretKey1234567890refreshSecretKey1234567890";
-    private final long refreshTokenExpirationMs = 7 * 24 * 60 * 60 * 1000; // 7dni
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpirationMs;
+
+    @Value("${jwt.refresh-token-secret}")
+    private String refreshTokenSecret;
 
     public String generateRefreshToken(String username) {
         Date now = new Date();
@@ -32,10 +37,14 @@ public class RefreshTokenService {
     }
 
     public String getUsernameFromRefreshToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(refreshTokenSecret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(refreshTokenSecret)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new RuntimeException("Invalid refresh token");
+        }
     }
 }
