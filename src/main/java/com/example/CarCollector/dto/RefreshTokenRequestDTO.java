@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class RefreshTokenRequestDTO {
 
-    @NotBlank
+    @NotBlank(message = "Refresh token cannot be blank")
     private String refreshToken;
 
     public String getRefreshToken() {
