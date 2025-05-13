@@ -5,6 +5,8 @@ import com.example.CarCollector.dto.RefreshTokenRequestDTO;
 import com.example.CarCollector.security.JwtService;
 import com.example.CarCollector.security.RefreshTokenService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,35 +18,43 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
     public AuthController(JwtService jwtService, RefreshTokenService refreshTokenService) {
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
-        System.out.println("AuthController initialized");
+        logger.info("AuthController initialized");
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        System.out.println("Login endpoint hit");
+        logger.info("Login endpoint hit");
 
         String username = loginRequestDTO.getUsername();
         String password = loginRequestDTO.getPassword();
-        System.out.println("Username: " + username);
-        System.out.println("Password: " + password);
+        logger.info("Username: {}",username);
+        logger.info("Password: {}",password);
 
         // sprawdzene user i password
         if (!"test123".equals(password) || !"user123".equals(username)) {
-            System.out.println("Invalid login attempt for username: " + username);
+            logger.warn("Invalid login attempt for username: {}",username);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password"));
         }
+
+        /*        String storedEncodedPassword = authService.registerUser(username, password); // Tylko dla testów
+        if (!passwordEncoder.matches(password, storedEncodedPassword)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password"));
+        }
+        */
 
         String accessToken = jwtService.generateToken(username);
         String refreshToken = refreshTokenService.generateRefreshToken(username);
 
-        System.out.println("Generated access token for " + username + ": " + accessToken);
-        System.out.println("Generated refresh token for " + username + ": " + refreshToken);
+        logger.info("Generated access token for {}: {} ",username,accessToken);
+        logger.info("Generated refresh token for {}: {} ",username,refreshToken);
 
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", accessToken);
@@ -55,13 +65,13 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO requestDTO) {
-        System.out.println("Refresh token endpoint hit");
+        logger.info("Refresh token endpoint hit");
 
         String refreshToken = requestDTO.getRefreshToken();
-        System.out.println("Received refresh token: " + refreshToken);
+        logger.debug("Received refresh token: {}",refreshToken);
 
         if (!refreshTokenService.verifyRefreshToken(refreshToken)) {
-            System.out.println("Invalid refresh token");
+            logger.warn("Invalid refresh token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
         }
 
@@ -69,12 +79,12 @@ public class AuthController {
         try {
             username = refreshTokenService.getUsernameFromRefreshToken(refreshToken);
         } catch (Exception e) {
-            System.out.println("Error extracting username from refresh token: " + e.getMessage());
+            logger.error("Error extracting username from refresh token: {}",e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
         }
 
         String newAccessToken = jwtService.generateToken(username);
-        System.out.println("Generated new access token for " + username + ": " + newAccessToken);
+        logger.info("Generated new access token for {}: {}",username,newAccessToken);
 
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", newAccessToken);

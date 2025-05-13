@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,8 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthentication extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthentication.class);
 
     private final JwtService jwtService;
 
@@ -30,20 +34,20 @@ public class JwtAuthentication extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            System.out.println("Extracted Token: " + token);
+            logger.info("Extracted Token: {}",token);
             if (jwtService.verifyToken(token)) {
                 String username = jwtService.getUsernameFromJwt(token);
-                System.out.println("Token valid for user: " + username);
+                logger.info("Token valid for user: {}",username);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(username, null, null);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }else {
-                System.out.println("Invalid JWT Token: " + token);
+                logger.warn("Invalid JWT Token: {}",token);
             }
         }else {
-            System.out.println("No valid Authorization header found");
+            logger.warn("No valid Authorization header found");
         }
 
         filterChain.doFilter(request, response);
