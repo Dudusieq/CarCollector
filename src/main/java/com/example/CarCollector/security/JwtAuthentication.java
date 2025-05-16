@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,9 +20,11 @@ public class JwtAuthentication extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthentication.class);
 
     private final JwtService jwtService;
+    private final CustomUserDetailsService CustomuserDetailsService;
 
-    public JwtAuthentication(JwtService jwtService) {
+    public JwtAuthentication(JwtService jwtService, CustomUserDetailsService customuserDetailsService) {
         this.jwtService = jwtService;
+        CustomuserDetailsService = customuserDetailsService;
     }
 
     @Override
@@ -39,9 +41,14 @@ public class JwtAuthentication extends OncePerRequestFilter {
                 String username = jwtService.getUsernameFromJwt(token);
                 logger.info("Token valid for user: {}",username);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, null);
+                UserDetails userDetails = CustomuserDetailsService.loadUserByUsername(username);
 
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }else {
                 logger.warn("Invalid JWT Token: {}",token);

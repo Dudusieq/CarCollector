@@ -2,6 +2,7 @@ package com.example.CarCollector.controller;
 
 import com.example.CarCollector.dto.LoginRequestDTO;
 import com.example.CarCollector.dto.RefreshTokenRequestDTO;
+import com.example.CarCollector.repository.UserRepository;
 import com.example.CarCollector.security.JwtService;
 import com.example.CarCollector.security.RefreshTokenService;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,46 +24,55 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    public AuthController(JwtService jwtService, RefreshTokenService refreshTokenService) {
+    public AuthController(JwtService jwtService, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
         logger.info("AuthController initialized");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        logger.info("Login endpoint hit");
+    public ResponseEntity<Map<String,String>> login(@RequestBody LoginRequestDTO req) {
+        return userRepository.findByUsername(req.getUsername())
+                .map(u -> {
+                    String raw  = req.getPassword();
+                    String hash = u.getPassword();
+                    boolean ok   = passwordEncoder.matches(raw, hash);
 
-        String username = loginRequestDTO.getUsername();
-        String password = loginRequestDTO.getPassword();
-        logger.info("Username: {}",username);
-        logger.info("Password: {}",password);
+                    logger.debug("Login attempt for {}: raw='{}', hash='{}'", u.getUsername(), raw, hash);
+                    logger.debug("passwordEncoder.matches -> {}", ok);
 
-        // sprawdzene user i password
-        if (!"test123".equals(password) || !"user123".equals(username)) {
-            logger.warn("Invalid login attempt for username: {}",username);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password"));
-        }
+                    if (!ok) {
+                        logger.warn("Invalid login attempt for username: {}", u.getUsername());
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of("error","Invalid username or password"));
+                    }
 
-        /*        String storedEncodedPassword = authService.registerUser(username, password); // Tylko dla testów
-        if (!passwordEncoder.matches(password, storedEncodedPassword)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password"));
-        }
-        */
 
-        String accessToken = jwtService.generateToken(username);
-        String refreshToken = refreshTokenService.generateRefreshToken(username);
+                    String accessToken  = jwtService.generateToken(u.getUsername());
+                    String refreshToken = refreshTokenService.generateRefreshToken(u.getUsername());
 
-        logger.info("Generated access token for {}: {} ",username,accessToken);
-        logger.info("Generated refresh token for {}: {} ",username,refreshToken);
+                    logger.info("Generated accessToken={} and refreshToken={} for user={}",
+                            accessToken, refreshToken, u.getUsername());
 
-        Map<String, String> response = new HashMap<>();
-        response.put("accessToken", accessToken);
-        response.put("refreshToken", refreshToken);
 
-        return ResponseEntity.ok(response);
+                    Map<String,String> body = new HashMap<>();
+                    body.put("accessToken",  accessToken);
+                    body.put("refreshToken", refreshToken);
+                    return ResponseEntity.ok(body);
+                })
+                .orElseGet(() -> {
+                    logger.warn("Login attempt for unknown user: {}", req.getUsername());
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error","Invalid username or password"));
+                });
     }
+
+
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO requestDTO) {
@@ -91,4 +102,10 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+    // dla wygenerowania hasla
+    /*@GetMapping("/debug/encode")
+    public String encode(@RequestParam String p) {
+        return passwordEncoder.encode(p);
+    }*/
+
 }

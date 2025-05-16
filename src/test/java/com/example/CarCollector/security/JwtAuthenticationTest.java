@@ -8,8 +8,11 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -17,13 +20,24 @@ import static org.mockito.Mockito.*;
 class JwtAuthenticationTest {
 
     private JwtService jwtService;
+    private CustomUserDetailsService customUserDetailsService;
     private JwtAuthentication filter;
     private String validToken;
 
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
-        filter = new JwtAuthentication(jwtService);
+        customUserDetailsService = mock(CustomUserDetailsService.class);
+
+        UserDetails ud = User.withUsername("user123")
+                .password("")
+                .authorities(Collections.emptyList())
+                .build();
+        when(customUserDetailsService.loadUserByUsername("user123"))
+                .thenReturn(ud);
+
+        filter = new JwtAuthentication(jwtService, customUserDetailsService);
+
         validToken = jwtService.generateToken("user123");
         SecurityContextHolder.clearContext();
     }
@@ -39,7 +53,7 @@ class JwtAuthenticationTest {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(auth, "Powinien być ustawiony obiekt Authentication");
-        assertEquals("user123", auth.getPrincipal());
+        assertEquals("user123", auth.getName());
         verify(chain).doFilter(req, res);
     }
 
