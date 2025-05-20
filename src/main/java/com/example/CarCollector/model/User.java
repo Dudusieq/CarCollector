@@ -1,6 +1,8 @@
 package com.example.CarCollector.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -18,6 +20,9 @@ public class User {
     @Column(nullable = false)
     private Boolean active;
 
+    @Column(name = "updated_at")
+    private LocalDate updatedAt;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -25,6 +30,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    public LocalDate getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDate updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public Boolean getActive() {
         return active;

@@ -1,6 +1,5 @@
 package com.example.CarCollector.dto;
 
-import com.example.CarCollector.model.Role;
 import lombok.AllArgsConstructor;
 
 import java.util.Set;

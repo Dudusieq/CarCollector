@@ -1,14 +1,15 @@
 package com.example.CarCollector.map;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.example.CarCollector.model.Role;
+import org.mapstruct.Mapper;
 
-import org.springframework.stereotype.Component;
+@Mapper(componentModel = "spring")
+public interface RoleMapper {
+    // konwersja String → Role
+    Role stringToRole(String name);
 
-@Component
-public class RoleMapper {
-
-    public List<String> rolesToStrings(List<String> roles) {
-        return roles.stream().map(String::toUpperCase).collect(Collectors.toList());
+    // konwersja Role → String
+    default String roleToString(Role role) {
+        return role == null ? null : role.getName();
     }
 }

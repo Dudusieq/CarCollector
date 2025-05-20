@@ -1,10 +1,10 @@
 package com.example.CarCollector.service;
 
 import com.example.CarCollector.dto.UserDTO;
+import com.example.CarCollector.dto.UserResponseDTO;
 import com.example.CarCollector.dto.UserUpdateDTO;
-import com.example.CarCollector.model.Role;
+import com.example.CarCollector.map.UserMapper;
 import com.example.CarCollector.model.User;
-import com.example.CarCollector.repository.RoleRepository;
 import com.example.CarCollector.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,83 +12,77 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
+@Transactional
 public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository repo;
+    private final UserMapper mapper;
+    private final PasswordEncoder encoder;
 
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    public UserService(UserRepository repo,
+                       UserMapper mapper,
+                       PasswordEncoder encoder) {
+        this.repo    = repo;
+        this.mapper  = mapper;
+        this.encoder = encoder;
     }
 
-
-    @Transactional
-    public User createUser(UserDTO dto) {
-        log.info("Creating user: {}", dto.getUsername());
-        // sprawdzenie czy nie juz takiego uzytkownika
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists: " + dto.getUsername());
-        }
-
-        // pobieranie roli
-        Set<Role> roles = dto.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
-                .collect(Collectors.toSet());
-
-        // tworenie encji uzytkownika
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setActive(true);
-        user.setRoles(roles);
-
-        return userRepository.save(user);
+    public UserResponseDTO createUser(UserDTO dto) {
+        log.info("Request to create user: {}", dto.getUsername());
+        User entity = mapper.toEntity(dto, encoder);
+        User saved  = repo.save(entity);
+        log.debug("User created: id={}, username={}", saved.getId(), saved.getUsername());
+        return mapper.toDto(saved);
     }
 
-    // aktualizacja uzytkownika
-    @Transactional
-    public User updateUser(Long userId, UserUpdateDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-
-        log.info("Updating user {} active={}", user.getUsername(), dto.getActive());
-        user.setActive(dto.getActive());
-        return userRepository.save(user);
+    public List<UserResponseDTO> getAllUsers() {
+        log.info("Request to list all users");
+        List<UserResponseDTO> dtos = repo.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
+        log.debug("Returning {} users", dtos.size());
+        return dtos;
     }
 
-    // usuwanie uzytkownika poprzez ustawienie active na false
-    @Transactional
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+    public UserResponseDTO getUserById(Long id) {
+        log.info("Request to get user by ID: {}", id);
+        User user   = repo.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("User not found: id={}", id);
+                    return new IllegalArgumentException("User not found");
+                });
+        UserResponseDTO dto = mapper.toDto(user);
+        log.debug("Found user: id={}, username={}", dto.getId(), dto.getUsername());
+        return dto;
+    }
 
-        log.info("Deactivating user: {}", user.getUsername());
+    public UserResponseDTO updateUser(Long id, UserUpdateDTO dto) {
+        log.info("Request to update user id={} active={}", id, dto.getActive());
+        User user   = repo.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("User not found: id={}", id);
+                    return new IllegalArgumentException("User not found");
+                });
+        mapper.updateFromDto(dto, user);
+        User updated = repo.save(user);
+        log.debug("User updated: id={}, active={}", updated.getId(), updated.getActive());
+        return mapper.toDto(updated);
+    }
+
+    public void deleteUser(Long id) {
+        log.info("Request to deactivate user id={}", id);
+        User user = repo.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("User not found: id={}", id);
+                    return new IllegalArgumentException("User not found");
+                });
         user.setActive(false);
-        userRepository.save(user);
-    }
-
-    // pobieranie uzytkownikow
-    @Transactional(readOnly = true)
-    public java.util.List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    // pobieranie jednego uzytkownika
-    @Transactional(readOnly = true)
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        repo.save(user);
+        log.debug("User deactivated: id={}", id);
     }
 }
